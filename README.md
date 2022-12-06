@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Backupscript: Erstellen und Zurückspielen von Verzeichnissen
+# Author : Ismail Erkam Demir
+# E-Mail : demiris@elektronikschule.de
+# Version: v01
+
 # Hauptmenu ausgeben
 function menu(){
 	clear
@@ -8,8 +13,8 @@ function menu(){
 	echo "|                                              |"
 	echo "|      Backup erstellen:      B                |"
 	echo "|      Inhalt eines Backups:  L                |"
-	echo "|      Backup zurÃ¼ck spielen: R                |"
-	echo "|      Backup lÃ¶schen:        D                |"
+	echo "|      Backup zurück spielen: R                |"
+	echo "|      Backup löschen:        D                |"
 	echo "|      Programm beenden:      X                |"
 	echo "|                                              |"
 	read -p "| Eingabe: " EINGABE
@@ -54,7 +59,7 @@ function backup(){
 	do
 		compress
 		echo "| Sind Sie sicher das Sie die Option ${COMPRESS}         |" 
-		echo "| benutzen mÃ¶chten?                            |"
+		echo "| benutzen möchten?                            |"
 		read -p "| (0: nein | 1: ja) " YESNO
 	done
 	# 
@@ -62,8 +67,8 @@ function backup(){
 	until [ $YESNO = 1 ]
 	do
 		where2Backup
-		echo "| Sind Sie sicher das Sie hier in speichern mÃ¶chten: ${WHERE2BACKUP}         |" 
-		echo "| benutzen mÃ¶chten?                            |"
+		echo "| Sind Sie sicher das Sie hier in speichern möchten: ${WHERE2BACKUP}         |" 
+		echo "| benutzen möchten?                            |"
 		read -p "| (0: nein | 1: ja) " YESNO
 	done
 	#
@@ -72,7 +77,7 @@ function backup(){
 	do
 		what2Backup	
 		echo "| Sind Sie sicher das Sie dieses Verzeichnis sichern wollen? ${WHAT2BACKUP}         |" 
-		echo "| benutzen mÃ¶chten?                            |"
+		echo "| benutzen möchten?                            |"
 		read -p "| (0: nein | 1: ja) " YESNO
 	done
 		
@@ -110,7 +115,7 @@ do
 			deletebackup
 			;;
 		*)
-			echo "Und TschÃ¼ss"
+			echo "Und Tschüss"
 			exit 1
 	esac
 	sleep 2
