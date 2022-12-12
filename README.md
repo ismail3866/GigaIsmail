@@ -1,100 +1,69 @@
 #!/bin/bash
 
 # Backupscript: Erstellen und Zurückspielen von Verzeichnissen
-# Author : Ismail Erkam Demir
-# E-Mail : demiris@elektronikschule.de
-# Version: v01
+# Author : Martin Rösner
+# Co-Author: Till Lohr
+# E-Mail : roesner@elektronikschule.de 
+# Version: v02
 
-# Hauptmenu ausgeben
-function menu(){
-	clear
-	echo "|----------------------------------------------|"
-	echo "| Haupmenu:                                    |"
-	echo "|                                              |"
-	echo "|      Backup erstellen:      B                |"
-	echo "|      Inhalt eines Backups:  L                |"
-	echo "|      Backup zurück spielen: R                |"
-	echo "|      Backup löschen:        D                |"
-	echo "|      Programm beenden:      X                |"
-	echo "|                                              |"
-	read -p "| Eingabe: " EINGABE
-}
-
-# Eingeben der Kompressionsmethode
-function compress(){
-	clear
-	echo "|----------------------------------------------|"
-	echo "| Kompressionsmethode:                         |"
-	echo "|                                              |"
-	echo "|      ZIP:                   z                |"
-	echo "|      BZIP2:                 j                |"
-	echo "|      XZ:                    J                |"
-	echo "|                                              |"
-	read -p "| Eingabe: " COMPRESS
-}
-
-# Eingeben des Backuppfades
-function where2Backup(){
-	clear
-	echo "|----------------------------------------------|"
-	echo "| Wohin soll das Backup gespeichert werden:    |"
-	echo "|                                              |"
-	read -p "| Eingabe: " WHERE2BACKUP 
-}
-
-# Eingeben des Pfades, der gesichert werden soll
-function what2Backup(){
-	clear
-	echo "|----------------------------------------------|"
-	echo "| Wohin soll das Backup gespeichert werden:    |"
-	echo "|                                              |"
-	read -p "| Eingabe: " WHAT2BACKUP 
-}
-
+source "funktionen.sh"
 
 function backup(){
 	BACKUPFILE=$(date +%Y%m%d-%H%M%S)-backup.tgz
-	YESNO=0
-	until [ $YESNO = 1 ]
-	do
-		compress
-		echo "| Sind Sie sicher das Sie die Option ${COMPRESS}         |" 
-		echo "| benutzen möchten?                            |"
-		read -p "| (0: nein | 1: ja) " YESNO
-	done
-	# 
-	YESNO=0
-	until [ $YESNO = 1 ]
-	do
-		where2Backup
-		echo "| Sind Sie sicher das Sie hier in speichern möchten: ${WHERE2BACKUP}         |" 
-		echo "| benutzen möchten?                            |"
-		read -p "| (0: nein | 1: ja) " YESNO
-	done
-	#
-	YESNO=0
-	until [ $YESNO = 1 ]
-	do
-		what2Backup	
-		echo "| Sind Sie sicher das Sie dieses Verzeichnis sichern wollen? ${WHAT2BACKUP}         |" 
-		echo "| benutzen möchten?                            |"
-		read -p "| (0: nein | 1: ja) " YESNO
-	done
-		
+	yesno-dialog compress 
+	yesno-dialog where2Backup 
+	yesno-dialog what2Backup 
+	if [ ! -d ${WHERE2BACKUP} ]
+        then
+                echo "| Verzeichnis ${WHERE2BACKUP} erstellt."
+                mkdir -p ${WHERE2BACKUP}
+        fi
 	tar cf${COMPRESS} ${WHERE2BACKUP}/$BACKUPFILE ${WHAT2BACKUP}
 	sleep 2
 }
 
 function unbackup(){
-	echo "UNBACKUP"
+	yesno-dialog where2Find
+	for I in $(find ${WHERE2FIND} -maxdepth 1 \( -name "*tgz" -o -name "*xz" -o -name "*bzip2" \) )
+	do 
+	    echo "|> "$I
+    	done
+	yesno-dialog what2Restore 
+	yesno-dialog where2Restore
+	if [ ! -d ${WHERE2RESTORE} ]
+	then
+		echo "| Verzeichnis ${WHERE2RESTORE} erstellt."
+		mkdir -p ${WHERE2RESTORE}
+	fi
+	cd ${WHERE2RESTORE}
+	tar xfz ${WHAT2RESTORE} ${WHERE2RESTORE}
 }
 
 function listbackup(){
-	echo "LISTBACKUP"
+	yesno-dialog where2Find 
+	for I in $(find ${WHERE2FIND} -maxdepth 1 \( -name "*tgz" -o -name "*xz" -o -name "*bzip2" \) )
+	do 
+		echo "|> "$I
+    	done
+	yesno-dialog what2List 
+	tar tvf ${WHAT2LIST}
+	read -p "| Beliebige Taste drücken ..." 
+	sleep 1
 }
 
 function deletebackup(){
-	echo "DELETEBACKUP"
+	yesno-dialog where2Find 
+	for I in $(find ${WHERE2FIND} -maxdepth 1 \( -name "*tgz" -o -name "*xz" -o -name "*bzip2" \) )
+	do 
+		echo "|> "$I
+	done
+   	yesno-dialog what2Del 
+	rm ${WHAT2DEL}
+	if [ $? = 0 ]
+	then
+		echo "| ${WHAT2DEL} wurde gelöscht!"
+	fi
+	sleep 2
 }
 
 # Hauptereignisschleife
